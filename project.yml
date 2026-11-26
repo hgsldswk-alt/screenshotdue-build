@@ -1,0 +1,175 @@
+name: ScreenshotDue
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+  knownRegions: [en, zh-Hans, zh-Hant]
+settings:
+  base:
+    APP_ID: com.hgsldswk.screenshotdue
+    APP_STORE_ID: ""
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  ScreenshotDue:
+    type: application
+    platform: iOS
+    sources: [ScreenshotDue, Shared]
+    dependencies:
+      - target: ScreenshotDueWidget
+        embed: true
+      - target: ScreenshotDueShare
+        embed: true
+      - sdk: libsqlite3.tbd
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID)
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: ScreenshotDue AppStore
+    entitlements:
+      path: ScreenshotDue/ScreenshotDue.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.hgsldswk.screenshotdue]
+        keychain-access-groups: [$(AppIdentifierPrefix)com.hgsldswk.screenshotdue]
+    info:
+      path: ScreenshotDue/Info.plist
+      properties:
+        CFBundleDisplayName: Screenshot To-Do
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+        APP_STORE_ID: $(APP_STORE_ID)
+        NSPhotoLibraryUsageDescription: Review screenshots you allow and confirm deletions in Photos.
+        PHPhotoLibraryPreventAutomaticLimitedAccessAlert: true
+        CFBundleURLTypes:
+          - CFBundleURLName: com.hgsldswk.screenshotdue
+            CFBundleURLSchemes: [screenshotdue]
+        LSSupportsOpeningDocumentsInPlace: false
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Screenshot To-Do Template
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Owner
+            LSItemContentTypes: [com.hgsldswk.screenshotdue.template]
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.hgsldswk.screenshotdue.template
+            UTTypeDescription: Screenshot To-Do Template
+            UTTypeConformsTo: [public.data]
+            UTTypeTagSpecification:
+              public.filename-extension: [stdtemplate]
+  ScreenshotDueWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - ScreenshotDueWidget
+      - path: Shared
+        excludes: [TaskForm.swift, Reminders.swift, ImportFlow.swift]
+    dependencies:
+      - sdk: libsqlite3.tbd
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).widget
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: ScreenshotDue Widget AppStore
+    entitlements:
+      path: ScreenshotDueWidget/ScreenshotDueWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.hgsldswk.screenshotdue]
+    info:
+      path: ScreenshotDueWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Screenshot To-Do
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+  ScreenshotDueShare:
+    type: app-extension
+    platform: iOS
+    sources: [ScreenshotDueShare, Shared]
+    dependencies:
+      - sdk: libsqlite3.tbd
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).share
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: ScreenshotDue Share AppStore
+    entitlements:
+      path: ScreenshotDueShare/ScreenshotDueShare.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.hgsldswk.screenshotdue]
+        keychain-access-groups: [$(AppIdentifierPrefix)com.hgsldswk.screenshotdue]
+    info:
+      path: ScreenshotDueShare/Info.plist
+      properties:
+        CFBundleDisplayName: Screenshot To-Do
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsImageWithMaxCount: 1
+  ScreenshotDueTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - ScreenshotDueTests
+      - path: Shared
+        excludes: [TaskForm.swift, ImportFlow.swift]
+      - path: ScreenshotDue/ShareCard.swift
+    dependencies:
+      - sdk: libsqlite3.tbd
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).tests
+        GENERATE_INFOPLIST_FILE: YES
+  ScreenshotDueUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [ScreenshotDueUITests]
+    dependencies:
+      - target: ScreenshotDue
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: ScreenshotDue
+schemes:
+  ScreenshotDue:
+    build:
+      targets:
+        ScreenshotDue: all
+        ScreenshotDueTests: [test]
+    test:
+      config: Debug
+      targets: [ScreenshotDueTests]
+  ScreenshotDueUI:
+    build:
+      targets:
+        ScreenshotDue: all
+        ScreenshotDueUITests: [test]
+    test:
+      config: Debug
+      targets: [ScreenshotDueUITests]
